@@ -56,7 +56,19 @@ def getLoc():
 
 def getWeather(zip):
     src = "http://mobile.weather.gov/port_zc.php?inputstring=%s&Go2=Go" % zip
-    weather = urllib2.urlopen(src).read()
+    weather_cache = cache_dir + '/weather.txt'
+    cache_timeout = 1800
+
+    if valid_cache(weather_cache, cache_timeout):
+        print "Using cached weather"
+        f = open(weather_cache, 'r')
+        weather = f.readlines()
+    else:
+        weather = urllib2.urlopen(src).read()
+        f = open(weather_cache, 'w')
+        f.write("%s\n" % weather)
+
+    f.close()
     return weather
 
 
