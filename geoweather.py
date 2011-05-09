@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import urllib2, os.path 
+import sys, urllib2, os.path
 import pygeoip
 
 cache_dir = os.path.expanduser('~') + '/.geoweather'
@@ -17,9 +17,13 @@ def getExternalIP():
 
 def getLoc():
     geodata = cache_dir + '/GeoLiteCity.dat'
-    gic = pygeoip.GeoIP(geodata)
-    loc = gic.record_by_addr(getExternalIP())
+    try:
+        gic = pygeoip.GeoIP(geodata)
+    except:
+        print "Unable to open the GeoIP database at %s." % geodata
+        sys.exit(1)
 
+    loc = gic.record_by_addr(getExternalIP())
     return (loc['city'], loc['region_name'])
 
 
