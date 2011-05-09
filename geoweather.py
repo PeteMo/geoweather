@@ -6,7 +6,7 @@ import pygeoip
 cache_dir = os.path.expanduser('~') + '/.geoweather'
 
 
-def __getExternalIP():
+def getExternalIP():
     src = 'http://www.whatismyip.com/automation/n09230945.asp'
     ip_cache = cache_dir + '/ip.txt'
 
@@ -18,7 +18,7 @@ def __getExternalIP():
 def getLoc():
     geodata = cache_dir + '/GeoLiteCity.dat'
     gic = pygeoip.GeoIP(geodata)
-    loc = gic.record_by_addr(__getExternalIP())
+    loc = gic.record_by_addr(getExternalIP())
 
     return (loc['city'], loc['region_name'])
 
