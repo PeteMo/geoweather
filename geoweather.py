@@ -27,8 +27,6 @@ def getExternalIP():
     ip_cache = cache_dir + '/ip.txt'
     cache_timeout = 300
 
-    # Get the last modified time from the cache file if it exists; otherwise, 
-    # fake the mtime to ensure the cache is created.
     if valid_cache(ip_cache, cache_timeout):
         print "Using cached IP"
         f = open(ip_cache, 'r')
@@ -54,8 +52,7 @@ def getLoc():
     return loc['postal_code']
 
 
-def getWeather(zip):
-    src = "http://mobile.weather.gov/port_zc.php?inputstring=%s&Go2=Go" % zip
+def getWeather(zip=None):
     weather_cache = cache_dir + '/weather.txt'
     cache_timeout = 1800
 
@@ -64,6 +61,7 @@ def getWeather(zip):
         f = open(weather_cache, 'r')
         weather = f.readlines()
     else:
+        src = "http://mobile.weather.gov/port_zc.php?inputstring=%s&Go2=Go" % getLoc()
         weather = urllib2.urlopen(src).read()
         f = open(weather_cache, 'w')
         f.write("%s\n" % weather)
@@ -73,8 +71,7 @@ def getWeather(zip):
 
 
 def main():
-    zip = getLoc()
-    print getWeather(zip)
+    print getWeather()
 
 
 if __name__ == "__main__":
