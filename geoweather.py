@@ -6,21 +6,30 @@ import pygeoip
 cache_dir = os.path.expanduser('~') + '/.geoweather'
 
 
+# Returns true if the cache is valid, false if the cache has expired or doesn't exist.
+def valid_cache(cache, timeout):
+    cache_timeout = datetime.timedelta(seconds=timeout)
+
+    try:
+        stat = os.stat(cache)
+        ctime = datetime.datetime.fromtimestamp(stat.st_ctime)
+    except:
+        return False
+
+    if datetime.datetime.today() < ctime + cache_timeout:
+        return True
+    else:
+        return False
+
+
 def getExternalIP():
     src = 'http://www.whatismyip.com/automation/n09230945.asp'
     ip_cache = cache_dir + '/ip.txt'
-    cache_timeout = datetime.timedelta(seconds=300)
+    cache_timeout = 300
 
     # Get the last modified time from the cache file if it exists; otherwise, 
     # fake the mtime to ensure the cache is created.
-    try:
-        stat = os.stat(ip_cache)
-        mtime = datetime.datetime.fromtimestamp(stat.st_mtime)
-    except OSError:
-        mtime = datetime.datetime(1980, 01, 01)
-
-    # Use the cache if it is valid.
-    if datetime.datetime.today() < mtime + cache_timeout:
+    if valid_cache(ip_cache, cache_timeout):
         print "Using cached IP"
         f = open(ip_cache, 'r')
         ip = f.readline()
