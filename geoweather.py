@@ -1,18 +1,32 @@
 #!/usr/bin/python
 
-import urllib2, pygeoip, os.path
+import urllib2, os.path 
+import pygeoip
 
 cache_dir = os.path.expanduser('~') + '/.geoweather'
-geodata = cache_dir + '/GeoLiteCity.dat'
 
 
-def getExternalIP():
+def __getExternalIP():
     src = 'http://www.whatismyip.com/automation/n09230945.asp'
+    ip_cache = cache_dir + '/ip.txt'
+
+    # Use cached data if we checked recently, otherwise hit src.
+
     return urllib2.urlopen(src).read()
 
 
-ip = getExternalIP()
-gic = pygeoip.GeoIP(geodata)
-loc = gic.record_by_addr(ip)
+def getLoc():
+    geodata = cache_dir + '/GeoLiteCity.dat'
+    gic = pygeoip.GeoIP(geodata)
+    loc = gic.record_by_addr(__getExternalIP())
 
-print "%s, %s %s" % (loc['city'], loc['region_name'], loc['postal_code'])
+    return (loc['city'], loc['region_name'])
+
+
+def main():
+    city, state = getLoc()
+    print "%s, %s" % (city, state)
+
+
+if __name__ == "__main__":
+    main()
