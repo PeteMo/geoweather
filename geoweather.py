@@ -42,12 +42,18 @@ def getLoc():
         sys.exit(1)
 
     loc = gic.record_by_addr(getExternalIP())
-    return (loc['city'], loc['region_name'])
+    return loc['postal_code']
+
+
+def getWeather(zip):
+    src = "http://mobile.weather.gov/port_zc.php?inputstring=%s&Go2=Go" % zip
+    weather = urllib2.urlopen(src).read()
+    return weather
 
 
 def main():
-    city, state = getLoc()
-    print "%s, %s" % (city, state)
+    zip = getLoc()
+    print getWeather(zip)
 
 
 if __name__ == "__main__":
