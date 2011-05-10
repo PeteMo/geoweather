@@ -23,6 +23,23 @@ def valid_cache(cache, timeout):
         return False
 
 
+# Returns the contents of url, possibly from a cache.
+def getHtml(url, cache_timeout=0):
+    cache_loc = os.path.join(cache_dir, base64.urlsafe_b64encode(url))
+
+    if valid_cache(cache_loc, cache_timeout):
+        print "Fetching %s from cache" % url
+        f = open(cache_loc, 'r')
+        html = f.read()
+    else:
+        html = urllib2.urlopen(url).read()
+        f = open(cache_loc, 'w')
+        f.write("%s\n" % html)
+    f.close()
+
+    return html
+
+
 def getExternalIP():
     src = 'http://www.whatismyip.com/automation/n09230945.asp'
     cache_timeout = 300
@@ -39,23 +56,6 @@ def getLoc():
 
     loc = gic.record_by_addr(getExternalIP())
     return loc['postal_code']
-
-
-# Returns the contents of url, possibly from a cache.
-def getHtml(url, cache_timeout=0):
-    cache_loc = os.path.join(cache_dir, base64.urlsafe_b64encode(url))
-
-    if valid_cache(cache_loc, cache_timeout):
-        print "Fetching %s from cache" % url
-        f = open(cache_loc, 'r')
-        html = f.read()
-    else:
-        html = urllib2.urlopen(url).read()
-        f = open(cache_loc, 'w')
-        f.write("%s\n" % html)
-    f.close()
-
-    return html
 
 
 def getWeather(zip=None):
