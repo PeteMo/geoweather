@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, urllib2, os, datetime
+import sys, urllib2, os, datetime, base64
 import pygeoip
 
 cache_dir = os.path.expanduser('~') + '/.geoweather'
@@ -52,20 +52,18 @@ def getLoc():
     return loc['postal_code']
 
 
-def getWeather(zip=None):
-    weather_cache = cache_dir + '/weather.txt'
+# Returns the contents of url, possibly from a cache.
+def getHtml(url):
     cache_timeout = 1800
+    cache_loc = os.path.join(cache_dir, base64.urlsafe_b64encode(url))
 
-    if valid_cache(weather_cache, cache_timeout):
-        print "Using cached weather"
-        f = open(weather_cache, 'r')
-        weather = f.readlines()
+    if valid_cache(cache_loc, cache_timeout):
+        f = open(cache_loc, 'r')
+        html = f.readlines()
     else:
-        src = "http://mobile.weather.gov/port_zc.php?inputstring=%s&Go2=Go" % getLoc()
-        weather = urllib2.urlopen(src).read()
-        f = open(weather_cache, 'w')
-        f.write("%s\n" % weather)
-
+        html = urllib2.urlopen(url).read()
+        f = open(cache_loc, 'w')
+        f.write("%s\n" % html)
     f.close()
     return weather
 
