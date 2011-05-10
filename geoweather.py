@@ -25,20 +25,8 @@ def valid_cache(cache, timeout):
 
 def getExternalIP():
     src = 'http://www.whatismyip.com/automation/n09230945.asp'
-    ip_cache = cache_dir + '/ip.txt'
     cache_timeout = 300
-
-    if valid_cache(ip_cache, cache_timeout):
-        print "Using cached IP"
-        f = open(ip_cache, 'r')
-        ip = f.readline()
-    else:
-        ip = urllib2.urlopen(src).read()
-        f = open(ip_cache, 'w')
-        f.write("%s\n" % ip)
-
-    f.close()
-    return ip
+    return getHtml(src, cache_timeout)
 
 
 def getLoc():
@@ -54,8 +42,7 @@ def getLoc():
 
 
 # Returns the contents of url, possibly from a cache.
-def getHtml(url):
-    cache_timeout = 1800
+def getHtml(url, cache_timeout=0):
     cache_loc = os.path.join(cache_dir, base64.urlsafe_b64encode(url))
 
     if valid_cache(cache_loc, cache_timeout):
@@ -77,13 +64,13 @@ def getWeather(zip=None):
 
     # The main page contains links to the forecast and the current conditions.
     main_loc = "%s/port_zc.php?inputstring=%s&Go2=Go" % (baseurl, getLoc())
-    main = getHtml(main_loc)
+    main = getHtml(main_loc, cache_timeout)
 
     # Follow the links to the forecast and current conditions.
     soup = BeautifulSoup(main)
     links = [each.get('href') for each in soup.findAll('a')]
-    forecast = getHtml("%s/%s" % (baseurl,links[0]))
-    current = getHtml("%s/%s" % (baseurl,links[2]))
+    forecast = getHtml("%s/%s" % (baseurl,links[0]), cache_timeout)
+    current = getHtml("%s/%s" % (baseurl,links[2]), cache_timeout)
     return forecast, current
 
 
