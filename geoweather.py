@@ -2,6 +2,7 @@
 
 import sys, urllib2, os, datetime, base64
 import pygeoip
+from BeautifulSoup import BeautifulSoup
 
 cache_dir = os.path.expanduser('~') + '/.geoweather'
 
@@ -65,11 +66,33 @@ def getHtml(url):
         f = open(cache_loc, 'w')
         f.write("%s\n" % html)
     f.close()
-    return weather
+
+    return html
+
+
+def getWeather(zip=None):
+    baseurl = 'http://mobile.weather.gov'
+    cache_timeout = 1800
+
+    # The main page contains links to the forecast and the current conditions.
+    main_loc = "%s/port_zc.php?inputstring=%s&Go2=Go" % (baseurl, getLoc())
+    main = getHtml(main_loc)
+
+    # Follow the links to the forecast and current conditions.
+    soup = BeautifulSoup(' '.join(main))
+    links = [each.get('href') for each in soup.findAll('a')]
+    forecast = getHtml("%s/%s" % (baseurl,links[0]))
+    current = getHtml("%s/%s" % (baseurl,links[2]))
+    return forecast, current
 
 
 def main():
-    print getWeather()
+    forecast, current = getWeather()
+    soup = BeautifulSoup(' '.join(forecast))
+    print soup.prettify()
+    print
+    soup = BeautifulSoup(' '.join(current))
+    print soup.prettify()
 
 
 if __name__ == "__main__":
