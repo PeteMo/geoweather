@@ -59,8 +59,9 @@ def getHtml(url):
     cache_loc = os.path.join(cache_dir, base64.urlsafe_b64encode(url))
 
     if valid_cache(cache_loc, cache_timeout):
+        print "Fetching %s from cache" % url
         f = open(cache_loc, 'r')
-        html = f.readlines()
+        html = f.read()
     else:
         html = urllib2.urlopen(url).read()
         f = open(cache_loc, 'w')
@@ -79,7 +80,7 @@ def getWeather(zip=None):
     main = getHtml(main_loc)
 
     # Follow the links to the forecast and current conditions.
-    soup = BeautifulSoup(' '.join(main))
+    soup = BeautifulSoup(main)
     links = [each.get('href') for each in soup.findAll('a')]
     forecast = getHtml("%s/%s" % (baseurl,links[0]))
     current = getHtml("%s/%s" % (baseurl,links[2]))
@@ -88,10 +89,10 @@ def getWeather(zip=None):
 
 def main():
     forecast, current = getWeather()
-    soup = BeautifulSoup(' '.join(forecast))
+    soup = BeautifulSoup(forecast)
     print soup.prettify()
     print
-    soup = BeautifulSoup(' '.join(current))
+    soup = BeautifulSoup(current)
     print soup.prettify()
 
 
