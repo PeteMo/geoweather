@@ -58,12 +58,12 @@ def getLoc():
     return loc['postal_code']
 
 
-def getWeather(zip=None):
+def getWeather(zcode):
     baseurl = 'http://mobile.weather.gov'
     cache_timeout = 1800
 
     # The main page contains links to the forecast and the current conditions.
-    main_loc = "%s/port_zc.php?inputstring=%s&Go2=Go" % (baseurl, getLoc())
+    main_loc = "%s/port_zc.php?inputstring=%s&Go2=Go" % (baseurl, zcode)
     main = getHtml(main_loc, cache_timeout)
 
     # Follow the links to the forecast and current conditions.
@@ -75,7 +75,12 @@ def getWeather(zip=None):
 
 
 def main():
-    forecast, current = getWeather()
+    if len(sys.argv) == 2:
+        loc = sys.argv[1]
+    else:
+        loc = getLoc()
+
+    forecast, current = getWeather(loc)
     soup = BeautifulSoup(forecast)
     print soup.prettify()
     print
