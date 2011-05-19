@@ -1,8 +1,7 @@
 #!/usr/bin/python
 
-import sys, urllib2, os, datetime, base64
+import sys, urllib2, os, datetime, base64, xml.dom.minidom
 import pygeoip
-from BeautifulSoup import BeautifulSoup
 
 cache_dir = os.path.expanduser('~') + '/.geoweather'
 
@@ -58,33 +57,25 @@ def getLoc():
     return loc['postal_code']
 
 
-def getWeather(zcode=getLoc()):
-    baseurl = 'http://mobile.weather.gov'
+def getURI(zcode=getLoc()):
+    baseurl = 'http://api.wunderground.com/auto/wui/geo/ForecastXML/index.xml?query=%s'
     cache_timeout = 1800
 
-    # The main page contains links to the forecast and the current conditions.
-    main_loc = "%s/port_zc.php?inputstring=%s&Go2=Go" % (baseurl, zcode)
-    main = getHtml(main_loc, cache_timeout)
+    wxml = getHtml(baseurl % zcode, cache_timeout)
+    dom = xml.dom.minidom.parseString(wxml)
 
-    # Follow the links to the forecast and current conditions.
-    soup = BeautifulSoup(main)
-    links = [each.get('href') for each in soup.findAll('a')]
-    forecast = getHtml("%s/%s" % (baseurl,links[0]), cache_timeout)
-    current = getHtml("%s/%s" % (baseurl,links[2]), cache_timeout)
-    return forecast, current
+    for node in dom.getElementsByTagName("forecastday"):
+        print node
 
 
 def main():
-    loc = None
     if len(sys.argv) == 2:
         loc = sys.argv[1]
+    else:
+        loc = None
 
-    forecast, current = getWeather(loc)
-    soup = BeautifulSoup(forecast)
-    print soup.prettify()
-    print
-    soup = BeautifulSoup(current)
-    print soup.prettify()
+    getURI(loc)
+    
 
 
 if __name__ == "__main__":
