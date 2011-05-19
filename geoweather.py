@@ -57,6 +57,18 @@ def getLoc():
     return loc['postal_code']
 
 
+def dump(obj):
+    for attr in dir(obj):
+        print "obj.%s = %s" % (attr, getattr(obj, attr))
+
+def getText(nodelist):
+    rc = []
+    for node in nodelist:
+        if node.nodeType == node.TEXT_NODE:
+            rc.append(node.data)
+    return ''.join(rc)
+
+
 def getURI(zcode=getLoc()):
     baseurl = 'http://api.wunderground.com/auto/wui/geo/ForecastXML/index.xml?query=%s'
     cache_timeout = 1800
@@ -64,8 +76,10 @@ def getURI(zcode=getLoc()):
     wxml = getHtml(baseurl % zcode, cache_timeout)
     dom = xml.dom.minidom.parseString(wxml)
 
-    for node in dom.getElementsByTagName("forecastday"):
-        print node
+#    dump(dom.getElementsByTagName("forecastday")[0].firstChild)
+    for day in dom.getElementsByTagName("forecastday"):
+        print day.getElementsByTagName("title")
+            
 
 
 def main():
