@@ -57,28 +57,22 @@ def getLoc():
     return loc['postal_code']
 
 
-def getText(nodelist):
-    rc = []
-    for node in nodelist:
-        if node.nodeType == node.TEXT_NODE:
-            rc.append(node.data)
-    return ''.join(rc)
-
-
-def getURI(zcode=getLoc()):
+def getWeather(zcode):
     baseurl = 'http://api.wunderground.com/auto/wui/geo/ForecastXML/index.xml?query=%s'
     cache_timeout = 1800
+    if zcode == None:
+        zcode = getLoc()
 
     wxml = getHtml(baseurl % zcode, cache_timeout)
     dom = xml.dom.minidom.parseString(wxml)
 
     for node in dom.getElementsByTagName("forecastday"):
-        day = node.getElementsByTagName("title")[0]
-        print getText(day.childNodes)
-        forecast = node.getElementsByTagName("fcttext")[0]
-        print getText(forecast.childNodes)
+        day = node.getElementsByTagName("title")
+        if day:
+            print day[0].childNodes[0].nodeValue
+            forecast = node.getElementsByTagName("fcttext")[0]
+            print forecast.childNodes[0].nodeValue
             
-
 
 def main():
     if len(sys.argv) == 2:
@@ -86,9 +80,8 @@ def main():
     else:
         loc = None
 
-    getURI(loc)
+    getWeather(loc)
     
-
 
 if __name__ == "__main__":
     main()
