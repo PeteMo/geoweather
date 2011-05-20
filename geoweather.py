@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, urllib2, os, datetime, base64, xml.dom.minidom
+import sys, os, urllib2, urllib, datetime, base64, xml.dom.minidom
 import pygeoip
 
 cache_dir = os.path.expanduser('~') + '/.geoweather'
@@ -45,7 +45,7 @@ def getExternalIP():
     return getHtml(src, cache_timeout)
 
 
-def getLoc():
+def getLocByIP():
     geodata = cache_dir + '/GeoLiteCity.dat'
     try:
         gic = pygeoip.GeoIP(geodata)
@@ -57,13 +57,12 @@ def getLoc():
     return loc['postal_code'], loc['city'] + ", " + loc['region_name']
 
 
-def getWeather(zcode):
-    baseurl = 'http://api.wunderground.com/auto/wui/geo/ForecastXML/index.xml?query=%s'
+def getWeather(loc):
+    baseurl = 'http://api.wunderground.com/auto/wui/geo/ForecastXML/index.xml?%s'
+    query = urllib.urlencode({'query' : loc})
     cache_timeout = 1800
-    if zcode == None:
-        zcode = getLoc()
 
-    wxml = getHtml(baseurl % zcode, cache_timeout)
+    wxml = getHtml(baseurl % query, cache_timeout)
     dom = xml.dom.minidom.parseString(wxml)
 
     for node in dom.getElementsByTagName("forecastday"):
@@ -71,17 +70,15 @@ def getWeather(zcode):
         if day:
             print day[0].childNodes[0].nodeValue
             forecast = node.getElementsByTagName("fcttext")[0]
-            print forecast.childNodes[0].nodeValue
-            print
+            print forecast.childNodes[0].nodeValue + '\n'
             
 
 def main():
-#    if len(sys.argv) == 2:
-#        loc = sys.argv[1]
-#    else:
-#        loc = None
+    if len(sys.argv) == 2:
+        zcode = loc = sys.argv[1]
+    else:
+        zcode, loc = getLocByIP()
 
-    zcode, loc = getLoc()
     print "Forecast for " + loc + '\n'
     getWeather(zcode)
     
