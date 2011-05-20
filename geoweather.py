@@ -54,7 +54,7 @@ def getLocByIP():
         sys.exit(1)
 
     loc = gic.record_by_addr(getExternalIP())
-    return loc['postal_code'], loc['city'] + ", " + loc['region_name']
+    return loc['postal_code']
 
 
 def getCurrent(loc):
@@ -96,12 +96,12 @@ def getForecast(loc):
 
 def main():
     if len(sys.argv) == 2:
-        zcode = loc = sys.argv[1]
+        loc = sys.argv[1]
     else:
-        zcode, loc = getLocByIP()
+        loc = getLocByIP()
 
-    getCurrent(zcode)
-    getForecast(zcode)
+    getCurrent(loc)
+    getForecast(loc)
     
 
 if __name__ == "__main__":
