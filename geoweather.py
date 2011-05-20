@@ -5,6 +5,14 @@ import pygeoip
 
 cache_dir = os.path.expanduser('~') + '/.geoweather'
 
+def usage(program):
+    print "Usage: %s [-a|-c|-f] [-h] [location]" % os.path.basename(program)
+    print "  -a  --all         (Default) Both current conditions and the forecast"
+    print "  -c  --current     Current conditions"
+    print "  -f  --forecast    Forecast"
+    print "  -h  --help        Print this help message"
+    print "  location          Zip code or city, state; performs geolocation via your"
+    print "                    current IP address by default."
 
 # Returns true if the cache is valid, false if the cache has expired or doesn't exist.
 def valid_cache(cache, timeout):
@@ -97,9 +105,10 @@ def getForecast(loc):
 def main():
     # Process options.
     try:
-        opts, args = getopt.gnu_getopt(sys.argv[1:], "acf", ["all", "current", "forecast"])
+        opts, args = getopt.gnu_getopt(sys.argv[1:], "acfh", ["all", "current", "forecast", "help"])
     except getopt.GetoptError, e:
         print str(e)
+        usage(sys.argv[0])
         sys.exit(1)
 
     # Get all weather data by default.
@@ -116,8 +125,13 @@ def main():
             current = True
         elif o in ("-f", "--forecast"):
             forecast = True
+        elif o in ("-h", "--help"):
+            usage(sys.argv[0])
+            sys.exit(0)
         else:
-            assert False, "Unhandled option"
+            print "Unknown option " + o
+            usage(sys.argv[0])
+            sys.exit(1)
 
     # Process arguments
     if len(args) > 0:
