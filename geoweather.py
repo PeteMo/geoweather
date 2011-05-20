@@ -57,7 +57,28 @@ def getLocByIP():
     return loc['postal_code'], loc['city'] + ", " + loc['region_name']
 
 
-def getWeather(loc):
+def getCurrent(loc):
+    baseurl = 'http://api.wunderground.com/auto/wui/geo/WXCurrentObXML/index.xml?%s'
+    query = urllib.urlencode({'query' : loc})
+    cache_timeout = 1800
+
+    wxml = getHtml(baseurl % query, cache_timeout)
+    dom = xml.dom.minidom.parseString(wxml)
+
+    for node in dom.getElementsByTagName("current_observation"):
+        location = node.getElementsByTagName("full")[0].childNodes[0].nodeValue
+        if location == ", ":
+            print "Invalid location " + loc
+        else:
+            print "Current Conditions for " + location
+            print node.getElementsByTagName("weather")[0].childNodes[0].nodeValue
+            print node.getElementsByTagName("temp_f")[0].childNodes[0].nodeValue + " F"
+            print "Wind " + node.getElementsByTagName("wind_string")[0].childNodes[0].nodeValue
+            print node.getElementsByTagName("relative_humidity")[0].childNodes[0].nodeValue + " Humidity"
+            print
+
+
+def getForecast(loc):
     baseurl = 'http://api.wunderground.com/auto/wui/geo/ForecastXML/index.xml?%s'
     query = urllib.urlencode({'query' : loc})
     cache_timeout = 1800
@@ -79,8 +100,8 @@ def main():
     else:
         zcode, loc = getLocByIP()
 
-    print "Forecast for " + loc + '\n'
-    getWeather(zcode)
+    getCurrent(zcode)
+    getForecast(zcode)
     
 
 if __name__ == "__main__":
