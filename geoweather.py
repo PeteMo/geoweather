@@ -120,7 +120,7 @@ def main():
             assert False, "Unhandled option"
 
     # Process arguments
-    if len(args) > 1:
+    if len(args) > 0:
         loc = ' '.join(args)
     else:
         loc = getLocByIP()
