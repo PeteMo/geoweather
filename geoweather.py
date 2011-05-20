@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, os, urllib2, urllib, datetime, base64, xml.dom.minidom
+import sys, os, urllib2, urllib, datetime, base64, xml.dom.minidom, getopt
 import pygeoip
 
 cache_dir = os.path.expanduser('~') + '/.geoweather'
@@ -95,13 +95,41 @@ def getForecast(loc):
             
 
 def main():
-    if len(sys.argv) == 2:
-        loc = sys.argv[1]
+    # Process options.
+    try:
+        opts, args = getopt.gnu_getopt(sys.argv[1:], "acf", ["all", "current", "forecast"])
+    except getopt.GetoptError, e:
+        print str(e)
+        sys.exit(1)
+
+    # Get all weather data by default.
+    if len(opts) == 0:
+        opts.append(('-a', ''))
+
+    current = False
+    forecast = False
+    for o, a in opts:
+        if o in ("-a", "--all"):
+            current = True
+            forecast = True
+        elif o in ("-c", "--current"):
+            current = True
+        elif o in ("-f", "--forecast"):
+            forecast = True
+        else:
+            assert False, "Unhandled option"
+
+    # Process arguments
+    if len(args) > 1:
+        loc = ' '.join(args)
     else:
         loc = getLocByIP()
 
-    getCurrent(loc)
-    getForecast(loc)
+    # Print the requested weather data.
+    if current:
+        getCurrent(loc)
+    if forecast:
+        getForecast(loc)
     
 
 if __name__ == "__main__":
