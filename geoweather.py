@@ -57,10 +57,6 @@ def getLoc():
     return loc['postal_code']
 
 
-def dump(obj):
-    for attr in dir(obj):
-        print "obj.%s = %s" % (attr, getattr(obj, attr))
-
 def getText(nodelist):
     rc = []
     for node in nodelist:
@@ -76,9 +72,11 @@ def getURI(zcode=getLoc()):
     wxml = getHtml(baseurl % zcode, cache_timeout)
     dom = xml.dom.minidom.parseString(wxml)
 
-#    dump(dom.getElementsByTagName("forecastday")[0].firstChild)
-    for day in dom.getElementsByTagName("forecastday"):
-        print day.getElementsByTagName("title")
+    for node in dom.getElementsByTagName("forecastday"):
+        day = node.getElementsByTagName("title")[0]
+        print getText(day.childNodes)
+        forecast = node.getElementsByTagName("fcttext")[0]
+        print getText(forecast.childNodes)
             
 
 
