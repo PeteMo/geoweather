@@ -27,7 +27,7 @@ def getHtml(url, cache_timeout=0):
     cache_loc = os.path.join(cache_dir, base64.urlsafe_b64encode(url))
 
     if valid_cache(cache_loc, cache_timeout):
-        print "Fetching %s from cache" % url
+#        print "Fetching %s from cache" % url
         f = open(cache_loc, 'r')
         html = f.read()
     else:
@@ -54,7 +54,7 @@ def getLoc():
         sys.exit(1)
 
     loc = gic.record_by_addr(getExternalIP())
-    return loc['postal_code']
+    return loc['postal_code'], loc['city'] + ", " + loc['region_name']
 
 
 def getWeather(zcode):
@@ -72,15 +72,18 @@ def getWeather(zcode):
             print day[0].childNodes[0].nodeValue
             forecast = node.getElementsByTagName("fcttext")[0]
             print forecast.childNodes[0].nodeValue
+            print
             
 
 def main():
-    if len(sys.argv) == 2:
-        loc = sys.argv[1]
-    else:
-        loc = None
+#    if len(sys.argv) == 2:
+#        loc = sys.argv[1]
+#    else:
+#        loc = None
 
-    getWeather(loc)
+    zcode, loc = getLoc()
+    print "Forecast for " + loc + '\n'
+    getWeather(zcode)
     
 
 if __name__ == "__main__":
