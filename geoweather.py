@@ -39,7 +39,11 @@ def getHtml(url, cache_timeout=0):
         f = open(cache_loc, 'r')
         html = f.read()
     else:
-        html = urllib2.urlopen(url).read()
+        try:
+            html = urllib2.urlopen(url).read()
+        except urllib2.URLError, e:
+            print e
+            sys.exit(1)
         f = open(cache_loc, 'w')
         f.write("%s\n" % html)
     f.close()
