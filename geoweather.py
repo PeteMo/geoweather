@@ -1,8 +1,7 @@
 #!/usr/bin/python
 
-import sys, urllib2, os, datetime, base64
+import sys, os, urllib2, urllib, datetime, base64, xml.dom.minidom
 import pygeoip
-from BeautifulSoup import BeautifulSoup
 
 cache_dir = os.path.expanduser('~') + '/.geoweather'
 
@@ -28,7 +27,7 @@ def getHtml(url, cache_timeout=0):
     cache_loc = os.path.join(cache_dir, base64.urlsafe_b64encode(url))
 
     if valid_cache(cache_loc, cache_timeout):
-        print "Fetching %s from cache" % url
+#        print "Fetching %s from cache" % url
         f = open(cache_loc, 'r')
         html = f.read()
     else:
@@ -46,7 +45,7 @@ def getExternalIP():
     return getHtml(src, cache_timeout)
 
 
-def getLoc():
+def getLocByIP():
     geodata = cache_dir + '/GeoLiteCity.dat'
     try:
         gic = pygeoip.GeoIP(geodata)
@@ -55,38 +54,55 @@ def getLoc():
         sys.exit(1)
 
     loc = gic.record_by_addr(getExternalIP())
-    return loc['postal_code']
+    return loc['postal_code'], loc['city'] + ", " + loc['region_name']
 
 
-def getWeather(zcode):
-    baseurl = 'http://mobile.weather.gov'
+def getCurrent(loc):
+    baseurl = 'http://api.wunderground.com/auto/wui/geo/WXCurrentObXML/index.xml?%s'
+    query = urllib.urlencode({'query' : loc})
     cache_timeout = 1800
 
-    # The main page contains links to the forecast and the current conditions.
-    main_loc = "%s/port_zc.php?inputstring=%s&Go2=Go" % (baseurl, zcode)
-    main = getHtml(main_loc, cache_timeout)
+    wxml = getHtml(baseurl % query, cache_timeout)
+    dom = xml.dom.minidom.parseString(wxml)
 
-    # Follow the links to the forecast and current conditions.
-    soup = BeautifulSoup(main)
-    links = [each.get('href') for each in soup.findAll('a')]
-    forecast = getHtml("%s/%s" % (baseurl,links[0]), cache_timeout)
-    current = getHtml("%s/%s" % (baseurl,links[2]), cache_timeout)
-    return forecast, current
+    for node in dom.getElementsByTagName("current_observation"):
+        location = node.getElementsByTagName("full")[0].childNodes[0].nodeValue
+        if location == ", ":
+            print "Invalid location " + loc
+        else:
+            print "Current Conditions for " + location
+            print node.getElementsByTagName("weather")[0].childNodes[0].nodeValue
+            print node.getElementsByTagName("temp_f")[0].childNodes[0].nodeValue + " F"
+            print "Wind " + node.getElementsByTagName("wind_string")[0].childNodes[0].nodeValue
+            print node.getElementsByTagName("relative_humidity")[0].childNodes[0].nodeValue + " Humidity"
+            print
 
+
+def getForecast(loc):
+    baseurl = 'http://api.wunderground.com/auto/wui/geo/ForecastXML/index.xml?%s'
+    query = urllib.urlencode({'query' : loc})
+    cache_timeout = 1800
+
+    wxml = getHtml(baseurl % query, cache_timeout)
+    dom = xml.dom.minidom.parseString(wxml)
+
+    for node in dom.getElementsByTagName("forecastday"):
+        day = node.getElementsByTagName("title")
+        if day:
+            print day[0].childNodes[0].nodeValue
+            forecast = node.getElementsByTagName("fcttext")[0]
+            print forecast.childNodes[0].nodeValue + '\n'
+            
 
 def main():
     if len(sys.argv) == 2:
-        loc = sys.argv[1]
+        zcode = loc = sys.argv[1]
     else:
-        loc = getLoc()
+        zcode, loc = getLocByIP()
 
-    forecast, current = getWeather(loc)
-    soup = BeautifulSoup(forecast)
-    print soup.prettify()
-    print
-    soup = BeautifulSoup(current)
-    print soup.prettify()
-
+    getCurrent(zcode)
+    getForecast(zcode)
+    
 
 if __name__ == "__main__":
     main()
