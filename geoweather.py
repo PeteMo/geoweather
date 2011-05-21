@@ -8,7 +8,7 @@ geodata = os.path.join(cache_dir, 'GeoLiteCity.dat')
 
 def usage(program):
     print "Usage: %s [-a|-c|-f] [-h] [location]" % os.path.basename(program)
-    print "  -a  --all         (Default) Both current conditions and the forecast"
+    print "  -a  --all         Both current conditions and the forecast (default)"
     print "  -c  --current     Current conditions"
     print "  -f  --forecast    Forecast"
     print "  -h  --help        Print this help message"
