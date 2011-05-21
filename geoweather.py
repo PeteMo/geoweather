@@ -4,6 +4,7 @@ import sys, os, urllib2, urllib, datetime, base64, xml.dom.minidom, getopt
 import pygeoip
 
 cache_dir = os.path.expanduser('~') + '/.geoweather'
+geodata = os.path.join(cache_dir, 'GeoLiteCity.dat')
 
 def usage(program):
     print "Usage: %s [-a|-c|-f] [-h] [location]" % os.path.basename(program)
@@ -34,6 +35,12 @@ def valid_cache(cache, timeout):
 def getHtml(url, cache_timeout=0):
     cache_loc = os.path.join(cache_dir, base64.urlsafe_b64encode(url))
 
+    # Clean the cache of old files.
+    for f in os.listdir(cache_dir):
+        fp = os.path.join(cache_dir, f)
+        if not valid_cache(fp, 3600) and fp != geodata:
+            os.unlink(fp)
+
     if valid_cache(cache_loc, cache_timeout):
 #        print "Fetching %s from cache" % url
         f = open(cache_loc, 'r')
@@ -58,7 +65,6 @@ def getExternalIP():
 
 
 def getLocByIP():
-    geodata = cache_dir + '/GeoLiteCity.dat'
     try:
         gic = pygeoip.GeoIP(geodata)
     except:
