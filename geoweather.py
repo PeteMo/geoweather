@@ -16,7 +16,7 @@ def usage(program):
     print "                    current IP address by default."
 
 # Returns true if the cache is valid, false if the cache has expired or doesn't exist.
-def valid_cache(cache, timeout):
+def valid_cache(cache, timeout=1800):
     cache_timeout = datetime.timedelta(seconds=timeout)
 
     try:
@@ -38,7 +38,7 @@ def getHtml(url, cache_timeout=0):
     # Clean the cache of old files.
     for f in os.listdir(cache_dir):
         fp = os.path.join(cache_dir, f)
-        if not valid_cache(fp, 3600) and fp != geodata:
+        if not valid_cache(fp) and fp != geodata:
             os.unlink(fp)
 
     if valid_cache(cache_loc, cache_timeout):
@@ -60,8 +60,7 @@ def getHtml(url, cache_timeout=0):
 
 def getExternalIP():
     src = 'http://www.whatismyip.com/automation/n09230945.asp'
-    cache_timeout = 300
-    return getHtml(src, cache_timeout)
+    return getHtml(src, 300)
 
 
 def getLocByIP():
@@ -78,9 +77,8 @@ def getLocByIP():
 def getCurrent(loc):
     baseurl = 'http://api.wunderground.com/auto/wui/geo/WXCurrentObXML/index.xml?%s'
     query = urllib.urlencode({'query' : loc})
-    cache_timeout = 1800
 
-    wxml = getHtml(baseurl % query, cache_timeout)
+    wxml = getHtml(baseurl % query)
     dom = xml.dom.minidom.parseString(wxml)
 
     for node in dom.getElementsByTagName("current_observation"):
@@ -99,9 +97,8 @@ def getCurrent(loc):
 def getForecast(loc):
     baseurl = 'http://api.wunderground.com/auto/wui/geo/ForecastXML/index.xml?%s'
     query = urllib.urlencode({'query' : loc})
-    cache_timeout = 1800
 
-    wxml = getHtml(baseurl % query, cache_timeout)
+    wxml = getHtml(baseurl % query)
     dom = xml.dom.minidom.parseString(wxml)
 
     for node in dom.getElementsByTagName("forecastday"):
