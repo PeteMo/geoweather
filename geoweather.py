@@ -32,7 +32,7 @@ def valid_cache(cache, timeout=1800):
 
 
 # Returns the contents of url, possibly from a cache.
-def getHtml(url, cache_timeout=0):
+def getUrl(url, cache_timeout=0):
     cache_loc = os.path.join(cache_dir, base64.urlsafe_b64encode(url))
 
     # Clean the cache of old files.
@@ -60,7 +60,7 @@ def getHtml(url, cache_timeout=0):
 
 def getExternalIP():
     src = 'http://www.whatismyip.com/automation/n09230945.asp'
-    return getHtml(src, 300)
+    return getUrl(src, 300)
 
 
 def getLocByIP():
@@ -78,7 +78,7 @@ def getCurrent(loc):
     baseurl = 'http://api.wunderground.com/auto/wui/geo/WXCurrentObXML/index.xml?%s'
     query = urllib.urlencode({'query' : loc})
 
-    wxml = getHtml(baseurl % query)
+    wxml = getUrl(baseurl % query)
     dom = xml.dom.minidom.parseString(wxml)
 
     for node in dom.getElementsByTagName("current_observation"):
@@ -98,7 +98,7 @@ def getForecast(loc):
     baseurl = 'http://api.wunderground.com/auto/wui/geo/ForecastXML/index.xml?%s'
     query = urllib.urlencode({'query' : loc})
 
-    wxml = getHtml(baseurl % query)
+    wxml = getUrl(baseurl % query)
     dom = xml.dom.minidom.parseString(wxml)
 
     for node in dom.getElementsByTagName("forecastday"):
