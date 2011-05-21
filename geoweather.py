@@ -124,7 +124,7 @@ def main():
 
     current = False
     forecast = False
-    for o, a in opts:
+    for o, _ in opts:
         if o in ("-a", "--all"):
             current = True
             forecast = True
