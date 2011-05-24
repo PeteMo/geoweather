@@ -42,7 +42,6 @@ def getUrl(url, cache_timeout=0):
             os.unlink(fp)
 
     if valid_cache(cache_loc, cache_timeout):
-#        print "Fetching %s from cache" % url
         f = open(cache_loc, 'r')
         html = f.read()
     else:
@@ -145,6 +144,9 @@ def main():
         loc = ' '.join(args)
     else:
         loc = getLocByIP()
+        if loc is None:
+            print "Unable to determine your location. Try specifying it on the command line."
+            sys.exit(0)
 
     # Print the requested weather data.
     if current:
