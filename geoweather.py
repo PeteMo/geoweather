@@ -58,7 +58,7 @@ def getUrl(url, cache_timeout=0):
 
 
 def getExternalIP():
-    src = 'http://www.whatismyip.com/automation/n09230945.asp'
+    src = 'http://automation.whatismyip.com/n09230945.asp'
     return getUrl(src, 300)
 
 
