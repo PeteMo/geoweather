@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, os, urllib2, urllib, datetime, base64, xml.dom.minidom, getopt
+import sys, os, urllib2, urllib, datetime, base64, xml.dom.minidom, getopt, textwrap
 import pygeoip
 
 cache_dir = os.path.expanduser('~') + '/.geoweather'
@@ -105,7 +105,7 @@ def getForecast(loc):
         if day:
             print day[0].childNodes[0].nodeValue
             forecast = node.getElementsByTagName("fcttext")[0]
-            print forecast.childNodes[0].nodeValue + '\n'
+            print '\n'.join(textwrap.wrap(forecast.childNodes[0].nodeValue, 80)) + '\n'
             
 
 def main():
