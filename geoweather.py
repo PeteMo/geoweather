@@ -105,7 +105,7 @@ def getForecast(loc):
         if day:
             print day[0].childNodes[0].nodeValue
             forecast = node.getElementsByTagName("fcttext")[0]
-            print '\n'.join(textwrap.wrap(forecast.childNodes[0].nodeValue, 80)) + '\n'
+            print textwrap.fill(forecast.childNodes[0].nodeValue, 80) + '\n'
             
 
 def main():
