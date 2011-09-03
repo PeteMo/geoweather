@@ -1,0 +1,28 @@
+Name:
+    geoweather
+
+
+Description: 
+    geoweather fetches the current weather conditions and forecast from
+wunderground based (by default) on IP based geolocation. You can also specify a
+location on the command line.
+
+
+Installation:
+    Create a ~/.geoweather directory containing the MaxMind geoLiteCity
+database. 
+
+
+Usage:
+    geoweather [-a|-c|-f] [-h] [location]
+             -a  --all         Both current conditions and the forecast (default)
+             -c  --current     Current conditions
+             -f  --forecast    Forecast
+             -h  --help        Print this help message
+             location          Zip code or city, state; performs geolocation via your
+                               current IP address by default.
+
+
+Dependencies:
+    pygeoip: http://code.google.com/p/pygeoip/
+    geoLiteCity database: http://www.maxmind.com/app/ip-location
