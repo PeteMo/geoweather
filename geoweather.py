@@ -1,6 +1,9 @@
 #!/usr/bin/python
+import sys, os, getopt, textwrap
+import datetime, base64, xml.dom.minidom
+import urllib2, urllib
 
-import sys, os, urllib2, urllib, datetime, base64, xml.dom.minidom, getopt, textwrap
+# http://code.google.com/p/pygeoip/
 import pygeoip
 
 cache_dir = os.path.expanduser('~') + '/.geoweather'
