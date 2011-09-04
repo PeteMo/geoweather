@@ -87,6 +87,7 @@ def getCurrent(loc):
         location = node.getElementsByTagName("full")[0].childNodes[0].nodeValue
         if location == ", ":
             print "Invalid location " + loc
+            sys.exit(1)
         else:
             print "Current Conditions for " + location
             print node.getElementsByTagName("weather")[0].childNodes[0].nodeValue
