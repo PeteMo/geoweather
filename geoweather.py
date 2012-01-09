@@ -34,15 +34,18 @@ def valid_cache(cache, timeout=1800):
         return False
 
 
-# Returns the contents of url, possibly from a cache.
-def getUrl(url, cache_timeout=0):
-    cache_loc = os.path.join(cache_dir, base64.urlsafe_b64encode(url))
-
+# Delete all files in the cache older than the cache timeout, except the geodata db.
+def clean_cache():
     # Clean the cache of old files.
     for f in os.listdir(cache_dir):
         fp = os.path.join(cache_dir, f)
         if not valid_cache(fp) and fp != geodata:
             os.unlink(fp)
+
+
+# Returns the contents of url, possibly from a cache.
+def getUrl(url, cache_timeout=0):
+    cache_loc = os.path.join(cache_dir, base64.urlsafe_b64encode(url))
 
     if valid_cache(cache_loc, cache_timeout):
         f = open(cache_loc, 'r')
@@ -157,6 +160,8 @@ def main():
         getCurrent(loc)
     if forecast:
         getForecast(loc)
+
+    clean_cache()
     
 
 if __name__ == "__main__":
