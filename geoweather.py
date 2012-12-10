@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import sys, os, getopt, textwrap
 import datetime, base64, xml.dom.minidom
 import urllib2, urllib
@@ -113,7 +113,6 @@ def getForecast(loc):
             print day[0].childNodes[0].nodeValue
             forecast = node.getElementsByTagName("fcttext")[0]
             print textwrap.fill(forecast.childNodes[0].nodeValue, 80) + '\n'
-            
 
 def main():
     # Process options.
